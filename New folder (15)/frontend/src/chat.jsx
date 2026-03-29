@@ -7,38 +7,36 @@ export default function Chat() {
   const sendMessage = async () => {
     if (!input) return;
 
-    const userMsg = { role: "user", text: input };
-    setMessages([...messages, userMsg]);
+    setMessages([...messages, { role: "user", text: input }]);
 
-    const res = await fetch(`http://127.0.0.1:8000/chat?q=${input}`);
-    const data = await res.json();
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/chat?q=${input}`);
+      const data = await res.json();
 
-    const botMsg = { role: "bot", text: data.response };
+      setMessages(prev => [...prev, { role: "bot", text: data.response }]);
+    } catch (err) {
+      console.error(err);
+    }
 
-    setMessages((prev) => [...prev, botMsg]);
     setInput("");
   };
 
   return (
-    <div className="chat-container">
-      <h1 className="title">⚡ AI RAG Assistant</h1>
-
-      <div className="chat-box">
-        {messages.map((msg, i) => (
-          <div key={i} className={msg.role}>
-            {msg.text}
-          </div>
+    <div style={{ padding: "20px" }}>
+      <div style={{ height: "60vh", overflowY: "auto" }}>
+        {messages.map((m, i) => (
+          <p key={i} style={{ textAlign: m.role === "user" ? "right" : "left" }}>
+            {m.text}
+          </p>
         ))}
       </div>
 
-      <div className="input-box">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask something..."
-        />
-        <button onClick={sendMessage}>Send</button>
-      </div>
+      <input
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        style={{ width: "70%" }}
+      />
+      <button onClick={sendMessage}>Send</button>
     </div>
   );
 }
