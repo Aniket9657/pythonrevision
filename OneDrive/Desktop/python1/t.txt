@@ -1,0 +1,1 @@
+want to print n = length of lust number to print from a list name Row
